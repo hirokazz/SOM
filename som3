@@ -1,0 +1,50 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+for i in range(1,10):
+    n = np.array([i]*10)
+    if i == 1:
+        ni = np.array([0]*10)
+    ni = np.append(ni,n)
+print(ni.shape)
+M = np.array([[i for i in range(0,10)]*10])
+print(M.shape)
+r = np.hstack((M.reshape(100,1),ni.reshape(100,1)))
+print(r[99])
+
+m1 = np.random.rand(100)
+m2 = np.random.rand(100)
+#g_m1 = Gaussian(m1)  
+#g_m2 = Gaussian(m2)
+m = np.array([m1,m2])
+
+def som(r,m):
+ 
+    for i in range(0,20001):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.3*(1.0-i/20001)+0.01
+        sigma2 = 2.0*(1.0-i/20001)+0.1
+        x = np.random.rand(1,2).reshape(2,1)
+     
+        for c_i in range(0,100):
+            c_x = np.absolute(m[:,c_i].reshape(2,1) - x)
+            if c_i == 0:
+                Y = c_x
+            else:    
+                Y = np.hstack((Y,c_x))
+        X = Y[0] + Y[1]
+        c = X.argmin(0)
+        if i % 2000 == 0:
+            for p in range(0,91,10):
+                plt.plot(m[0][p:p+10],m[1][p:p+10],marker="o",markersize=5,markeredgecolor="blue",markerfacecolor="lightblue")
+            for p2 in range(0,10):  
+                plt.plot(m[0][p2:p2+91:10],m[1][p2:p2+91:10],marker="o",markersize=5,markeredgecolor="blue",markerfacecolor="lightblue")
+
+            plt.savefig('somgraph%d.png' %i)
+            plt.show()
+        else:    
+            for m_i in range(0,100):
+                m_x = m[:,m_i].reshape(2,1) + alpha * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/2*sigma**2)*(x - m[:,m_i].reshape(2,1))
+                m[:,m_i] = m_x.reshape(1,2)
+som(r,m)
