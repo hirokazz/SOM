@@ -1,0 +1,46 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def Gaussian(x): 
+    sigma = 1
+    mean = 1
+    y = (1 / np.sqrt(2 * np.pi * sigma))*(np.exp((-(x - mean)**2)/( 2 * sigma ) ))
+    return y
+
+
+n = 20
+m1 = np.random.rand(n)
+m2 = np.random.rand(n)
+g_m1 = Gaussian(m1)  
+g_m2 = Gaussian(m2)
+m = np.array([g_m1,g_m2])
+
+
+def som(m):
+ 
+    for i in range(0,2001):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.3*(1.0-i/20001)+0.01
+        sigma2 = 2.0*(1.0-i/20001)+0.1
+        x = np.random.rand(1,2).reshape(2,1)
+     
+        for c_i in range(0,20):
+            c_x = np.absolute(m[:,c_i].reshape(2,1) - x)
+            if c_i == 0:
+                Y = c_x
+            else:    
+                Y = np.hstack((Y,c_x))
+        X = Y[0] + Y[1]
+        c = X.argmin(0)
+        if i % 200 == 0:
+            plt.plot(m[0],m[1],marker="o",markersize=5,markeredgecolor="blue",
+  markerfacecolor="lightblue")
+            #plt.savefig('graph%d.png' %i)
+            plt.show()
+        else:    
+            for m_i in range(0,10):
+                m_x = m[:,m_i].reshape(2,1) + alpha2 * np.exp(-(abs(c-m_i)**2)/2*sigma2**2)*(x - m[:,m_i].reshape(2,1))
+                m[:,m_i] = m_x.reshape(1,2)
+som(m)
