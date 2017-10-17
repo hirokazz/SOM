@@ -1,0 +1,22 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+m1 = np.random.rand(20)
+m = Gaussian(m1)
+def som(m):
+    
+    for i in range(0,2001):
+        alpha = 0.3*(1.0-i/2001)+0.01
+        sigma = 2.0*(1.0-i/2001)+0.1
+        x = np.random.rand()
+        c = (abs(m - x)).argmin(0)
+        if i % 100 == 0:
+            som2(i,m)
+            som3(i,m)
+        else:    
+            for m_i in range(0,20):
+                m[m_i] = m[m_i] + alpha * np.exp(-(abs(c-m_i)**2)/2*sigma**2)*(x - m[m_i])
+
+som(m)
+                 
