@@ -1,0 +1,54 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+for i in range(1,20):
+    n = np.array([i]*20)
+    if i == 1:
+        ni = np.array([0]*20)
+    ni = np.append(ni,n)
+print(ni.shape)
+M = np.array([[i for i in range(0,20)]*20])
+print(M.shape)
+r = np.hstack((M.reshape(400,1),ni.reshape(400,1)))
+
+def Gaussian(x): 
+    sigma = 1
+    mean = 1
+    y = (1 / np.sqrt(2 * np.pi * sigma))*(np.exp((-(x - mean)**2)/( 2 * sigma ) ))
+    return y
+
+#m1 = np.random.rand(400)
+#m2 = np.random.rand(400)
+
+m = np.array([m1,m2])
+
+def som(r,m):
+ 
+    for i in range(0,20001):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.3*(1.0-i/20001)+0.01
+        sigma2 = 2.0*(1.0-i/20001)+0.1
+        x = np.random.rand(1,2).reshape(2,1)
+     
+        for c_i in range(0,400):
+            c_x = np.absolute(m[:,c_i].reshape(2,1) - x)
+            if c_i == 0:
+                Y = c_x
+            else:    
+                Y = np.hstack((Y,c_x))
+        X = Y[0] + Y[1]
+        c = X.argmin(0)
+        if i % 2000 == 0:
+            for p in range(0,381,20):
+                plt.plot(m[0][p:p+20],m[1][p:p+20],marker="o",markersize=5,markeredgecolor="blue",markerfacecolor="lightblue")
+            for p2 in range(0,20):  
+                plt.plot(m[0][p2:p2+381:20],m[1][p2:p2+381:20],marker="o",markersize=5,markeredgecolor="blue",markerfacecolor="lightblue")
+
+            plt.savefig('som3graph%d.png' %i)
+            plt.show()
+        else:    
+            for m_i in range(0,400):
+                m_x = m[:,m_i].reshape(2,1) + alpha2 * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/2*sigma2**2)*(x - m[:,m_i].reshape(2,1))
+                m[:,m_i] = m_x.reshape(1,2)
+som(r,m)
