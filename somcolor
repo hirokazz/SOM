@@ -1,0 +1,69 @@
+import matplotlib.pyplot as plt
+import numpy as np
+ 
+col = np.random.rand(400, 3)    
+
+print(col[0].shape)
+ 
+x = np.arange(0,100)
+y = np.arange(0,100)
+a = 0
+for y_i in range(0,20):
+  
+    for i in range(0,20):
+        plt.fill_between((x[i],x[i+1]),y[y_i],y[y_i+1],facecolor=col[a])
+        a = a + 1
+    
+plt.show()
+
+for i in range(1,20):
+    n = np.array([i]*20)
+    if i == 1:
+        ni = np.array([0]*20)
+    ni = np.append(ni,n)
+M = np.array([[i for i in range(0,20)]*20])
+r = np.hstack((M.reshape(400,1),ni.reshape(400,1)))
+
+def Gaussian(x): 
+    sigma = 1
+    mean = 1
+    y = (1 / np.sqrt(2 * np.pi * sigma))*(np.exp((-(x - mean)**2)/( 2 * sigma ) ))
+    return y
+
+m1 = np.random.rand(400)
+m2 = np.random.rand(400)
+
+m = np.array([m1,m2])
+
+def som(x,y,r,col):
+ 
+    for i in range(0,10001):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.3*(1.0-i/10001)+0.01
+        sigma2 = 2.0*(1.0-i/10001)+0.1
+        x2 = np.random.rand(1,3).reshape(3,1)
+        X = 1
+        for c_i in range(0,400):
+            c_x = np.linalg.norm(col[c_i].reshape(3,1)-x2)
+
+            if X > c_x:
+                X = c_x
+                
+                c = c_i
+                
+        if i % 1000 == 0:
+            a = 0    
+            for y_i in range(0,20):
+                for x_i in range(0,20):
+                    plt.fill_between((x[x_i],x[x_i+1]),y[y_i],y[y_i+1],facecolor=col[a])
+                    a = a + 1
+    
+                    
+            plt.savefig('somcolor%d.png' % i)
+            plt.show()
+        else:    
+            for m_i in range(0,400):
+                m_x = col[m_i].reshape(3,1) + alpha2 * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/2*sigma2**2)*(x2 - col[m_i].reshape(3,1))
+                col[m_i] = m_x.reshape(1,3)
+som(x,y,r,col)
