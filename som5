@@ -57,7 +57,7 @@ def som(x,m,r):
             plt.figure(figsize=(8,8))            
             pil_img = Image.fromarray(np.uint8(img))
             plt.imshow(pil_img)
-            plt.savefig('somthree%d.png' % i,dpi=600)
+            plt.savefig('somthree%d.png' % i,dpi=300)
             plt.show()
             
         else:                                      
