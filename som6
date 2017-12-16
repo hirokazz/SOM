@@ -1,0 +1,57 @@
+import numpy as np
+from numpy.random import *
+import matplotlib.pyplot as plt
+
+for i in range(1,10):
+    n = np.array([i]*10)
+    if i == 1:
+        ni = np.array([0]*10)
+    ni = np.append(ni,n)
+M = np.array([[i for i in range(0,10)]*10])
+r = np.hstack((M.reshape(100,1),ni.reshape(100,1)))
+
+N = 500
+theta = np.linspace(0, 2 * np.pi, N)
+r1, r2 = 1.5, 3.0
+small = np.array([r1 * np.cos(theta), r1 * np.sin(theta)])
+large = np.c_[r2 * np.cos(theta), r2 * np.sin(theta)]
+x = small + np.random.randn(2,500) * 0.25
+
+m1 = np.random.rand(100)
+m2 = np.random.rand(100)
+#g_m1 = Gaussian(m1)  
+#g_m2 = Gaussian(m2)
+m = np.array([m1,m2])
+
+def som(x,r,m):
+ 
+    for i in range(0,10001):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.9*(1.0-i/10001)+0.01
+        sigma2 = 1.0*(1.0-i/10001)+0.1
+        xi = randint(0,500)
+     
+        for c_i in range(0,100):
+            c_x = np.absolute(m[:,c_i].reshape(2,1) - x[:,xi].reshape(2,1))
+            if c_i == 0:
+                Y = c_x
+            else:    
+                Y = np.hstack((Y,c_x))
+        X = Y[0] + Y[1]
+        c = X.argmin(0)
+        if i % 1000 == 0:
+            plt.plot(x[0], x[1], 'bo',markersize=3)
+            for p in range(0,91,10):
+                plt.plot(m[0][p:p+10],m[1][p:p+10],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+            for p2 in range(0,10):  
+                plt.plot(m[0][p2:p2+91:10],m[1][p2:p2+91:10],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+            plt.title('i=' + str(i))
+            plt.savefig('somgraph%d.png' %i)
+            plt.show()
+        else:    
+            for m_i in range(0,100):
+                m_x = m[:,m_i].reshape(2,1) + alpha2 * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/2*sigma2**2)*(x[:,xi].reshape(2,1) - m[:,m_i].reshape(2,1))
+                m[:,m_i] = m_x.reshape(1,2)
+    return m                    
+m = som(x,r,m)
