@@ -51,7 +51,7 @@ def som(x,r,m):
             plt.show()
         else:    
             for m_i in range(0,100):
-                m_x = m[:,m_i].reshape(2,1) + alpha2 * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/2*sigma2**2)*(x[:,xi].reshape(2,1) - m[:,m_i].reshape(2,1))
+                m_x = m[:,m_i].reshape(2,1) + alpha2 * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/(2*sigma2**2))*(x[:,xi].reshape(2,1) - m[:,m_i].reshape(2,1))
                 m[:,m_i] = m_x.reshape(1,2)
     return m                    
 m = som(x,r,m)
