@@ -63,6 +63,6 @@ def som(x,m,r):
         else:                                      
             for m_i in range(0,100):
               
-                m_x = m[m_i] + alpha2 * np.exp(-(np.linalg.norm(r[c2]-r[m_i]))**2/2*sigma2**2)*(x[i%4] - m[m_i])
+                m_x = m[m_i] + alpha2 * np.exp(-(np.linalg.norm(r[c2]-r[m_i]))**2/(2*sigma2**2))*(x[i%4] - m[m_i])
                 m[m_i] = m_x
 som(x,m,r)
