@@ -1,0 +1,55 @@
+import numpy as np
+from numpy.random import *
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+for i in range(1,10):
+    n = np.array([i]*10)
+    if i == 1:
+        ni = np.array([0]*10)
+    ni = np.append(ni,n)
+M = np.array([[i for i in range(0,10)]*10])
+r = np.hstack((M.reshape(100,1),ni.reshape(100,1)))
+
+
+batch = 49
+x = rand(2,batch)
+m = rand(2,100)
+
+c = np.array(([0]*500))
+def som(x,batch,r,m,c):
+ 
+    for i in range(0,101):
+        #alpha = 0.2
+        sigma2 = 13*np.exp(-i/3001) +0.01
+        #alpha2 = 0.5*(1.0-i/3001)
+        #sigma2 = 13.0*(1.0-i/2001) +0.01
+        if i == 2999:
+            print('a')
+        if i%batch != 0 or i == 0:
+            c_x = np.ones(100)
+            for c_i in range(0,100):
+                c_x[c_i] = np.linalg.norm(m[:,c_i]-x[:,i%batch])
+            c[i%batch] = np.argmin(c_x)
+            if i % 10 == 0:
+                for p in range(0,91,10):
+                    plt.plot(m[0][p:p+10],m[1][p:p+10],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+                for p2 in range(0,10):  
+                    plt.plot(m[0][p2:p2+91:10],m[1][p2:p2+91:10],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+                plt.title('i=' + str(i))
+                #plt.savefig('somgraph%d.png' %i)
+                plt.show()
+        else:
+            
+            for m_k in range(0,100):
+                
+                m_x = np.array([0,0])
+                m_y = np.array([0,0])
+                for m_i in range(0,batch):
+                    c_j = c[m_i]
+                    m_x = m_x + np.exp(-(np.linalg.norm(r[c_j]-r[m_k]))**2/(2*sigma2**2))*x[:,m_i]
+                    m_y = m_y + np.exp(-(np.linalg.norm(r[c_j]-r[m_k]))**2/(2*sigma2**2))
+                m[:,m_k] = m_x/m_y                                      
+           
+    return m                    
+m = som(x,batch,r,m,c)
