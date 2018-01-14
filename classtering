@@ -1,0 +1,43 @@
+q2 = np.random.rand(som_size**2,som_size**2)
+for i in range(0,som_size**2):
+    for j in range(0,som_size**2):
+        q2[i][j] = np.linalg.norm(m[i]-m[j])
+        if q2[i][j] > 3:
+            q2[i][j] = 4
+            
+Z = np.random.rand(som_size*2)
+Z2 = np.random.rand(som_size*2)
+for k in range(0,som_size):
+    for i in range(0,som_size+1):
+        if i == 0:
+            Z[i*2] = 4   
+        elif i == som_size:
+            Z[i*2-1] =4
+        else:
+            Z[i*2-1] = q2[som_size*k+i-1][som_size*k+i]
+            Z[i*2] = q2[som_size*k+i-1][som_size*k+i]
+    for j in range(0,som_size):
+        if k != som_size-1:
+            Z2[j*2] = q2[som_size*k+j][som_size*k+j+som_size]
+            Z2[j*2+1] = q2[som_size*k+j][som_size*k+j+som_size]
+    if k == 0:
+        Z3 =np.hstack((Z,Z2))
+    elif k == som_size-1:
+        Z3 =np.hstack((Z3,Z))
+    else:    
+        Z3 =np.hstack((Z3,Z))
+        Z3 =np.hstack((Z3,Z2))
+        
+Z3 = Z3.reshape(som_size*2-1,som_size*2)
+x2 = np.arange(som_size*2+1)
+y2 = np.arange(0,som_size,0.5)[::-1]
+X,Y = np.meshgrid(x2, y2)
+Z3 = Z3.reshape(som_size*2-1,som_size*2)
+print(Z3.shape)
+print(X)
+
+#plt.axis("off")
+plt.pcolormesh(X, Y, Z3,cmap="binary")
+plt.colorbar()
+plt.savefig('30somMNIST20001.png',dpi=200)
+plt.show()
