@@ -1,0 +1,125 @@
+import numpy as np
+from numpy.random import *
+import matplotlib.pyplot as plt
+
+for i in range(1,20):
+    n = np.array([i]*20)
+    if i == 1:
+        ni = np.array([0]*20)
+    ni = np.append(ni,n)
+M = np.array([[i for i in range(0,20)]*20])
+r = np.hstack((M.reshape(400,1),ni.reshape(400,1)))
+
+m1 = np.random.rand(400)
+m2 = np.random.rand(400)
+m_1 = np.random.normal(0, 1,400)
+m_2 = np.random.normal(0, 1,400)
+m = np.array([m1,m2])
+def som(r,m):
+ 
+    for i in range(0,101):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.5*(1.0-i/101)+0.1
+        sigma2 = 10*(1.0-i/101)+0.1
+        x = np.random.rand(1,2).reshape(2,1)
+     
+        for c_i in range(0,400):
+            c_x = np.absolute(m[:,c_i].reshape(2,1) - x)
+            if c_i == 0:
+                Y = c_x
+            else:    
+                Y = np.hstack((Y,c_x))
+        X = Y[0] + Y[1]
+        c = X.argmin(0)
+        if i % 20 == 0:
+            for p in range(0,381,20):
+                plt.plot(m[0][p:p+20],m[1][p:p+20],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+            for p2 in range(0,20):  
+                plt.plot(m[0][p2:p2+381:20],m[1][p2:p2+381:20],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+            plt.title('i=' + str(i))
+            #plt.savefig('som3graph%d.png' %i)
+            plt.show()
+        else:    
+            for m_i in range(0,400):
+                m_x = m[:,m_i].reshape(2,1) + alpha2 * np.exp(-(np.linalg.norm(r[c]-r[m_i]))**2/(2*sigma2**2))*(x - m[:,m_i].reshape(2,1))
+                m[:,m_i] = m_x.reshape(1,2)
+    return m
+m = som(r,m)
+
+
+N = 500
+theta = np.linspace(0, 2 * np.pi, N/2)*3
+r1, r2 = 0.5, 3.0
+small = np.array([r1 * np.cos(theta)-3, r1 * np.sin(theta)+5])
+small2 = np.array([r1 * np.cos(theta)+3, r1 * np.sin(theta)+5])
+small3 = np.array([r1 * np.cos(theta)+3, r1 * np.sin(theta)-5])
+small4 = np.array([r1 * np.cos(theta)-3, r1 * np.sin(theta)-5])
+large = np.c_[r2 * np.cos(theta), r2 * np.sin(theta)]
+s2 = np.array([np.cos(theta)+theta*np.sin(theta), np.sin(theta)-theta*np.cos(theta)])
+x = np.c_[small,small2,small3,small4] + np.random.randn(2,N*2) * 0.75
+np.random.shuffle(x)
+#plt.plot(m[0],m[1],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+plt.plot(x[0], x[1], 'bo',markersize=3)
+plt.show()
+
+
+N = 1000
+theta = np.linspace(0, 2 * np.pi, N/2)*3
+r1, r2 = 1.5, 5.0
+small = np.array([r1 * np.cos(theta), r1 * np.sin(theta)])
+large = np.array([r2 * np.cos(theta), r2 * np.sin(theta)])
+s2 = np.array([np.cos(theta)+theta*np.sin(theta), np.sin(theta)-theta*np.cos(theta)])
+x = np.c_[small,large] + np.random.randn(2,N) * 0.25
+plt.plot(x[0], x[1], 'bo',markersize=3)
+plt.show()
+print(small.shape)
+
+q = np.random.rand(400,400)
+for i in range(0,400):
+    for j in range(0,400):
+        q[i][j] = np.linalg.norm(r[i]-r[j])
+print(q[399][399])
+
+
+m1 = uniform(-6,6,(400))
+m2 = uniform(-8,8,(400))
+m = np.array([m1,m2])
+print(m[:,0])
+N = 2001
+c = np.array(([10]*N))
+        
+def som(x,r,m,c,N,q):
+ 
+    for i in range(0,N):
+        alpha = 0.2
+        sigma = 0.8
+        #alpha2 = 1
+        alpha2 = 0.5*(1.0-i/N)+0.2
+        sigma2 = 10.0*(1.0-i/N)
+        xi = randint(0,1000)
+        c_x = np.array(([100.00000000000]*400))
+        for c_i in range(0,400):
+            c_x[c_i] = np.linalg.norm(x[:,xi]-m[:,c_i])
+        c[i] = np.argmin(c_x)    
+        if i % 200 == 0:
+            plt.plot(x[0], x[1], 'bo',markersize=3)
+            for p in range(0,381,20):
+                plt.plot(m[0][p:p+20],m[1][p:p+20],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+            for p2 in range(0,20):  
+                plt.plot(m[0][p2:p2+381:20],m[1][p2:p2+381:20],color='red',  linestyle='solid', linewidth = 1.0,marker="o",markersize=3,markeredgecolor="red",markerfacecolor="red")
+            plt.title('i=' + str(i))
+            plt.savefig('som3_20gragh%d.png' %i)
+            plt.show()
+        else:
+            q2 = np.where(q[c[i]] < sigma2) 
+            for m_i in range(0,q2[0].size):
+                m_x = m[:,q2[0][m_i]].reshape(2,1) + alpha2 * np.exp(-(np.linalg.norm(r[c[i]]-r[q2[0][m_i]]))**2/(2*sigma2**2))*(x[:,xi].reshape(2,1) - m[:,q2[0][m_i]].reshape(2,1))
+                m[:,q2[0][m_i]] = m_x.reshape(1,2)
+            
+            
+som(x,r,m,c,N,q)
+
+print(c[101])
+plt.hist(c,bins=400,rwidth=0.8)
+plt.show()
