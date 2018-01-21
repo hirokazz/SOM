@@ -1,0 +1,93 @@
+from PIL import Image
+import numpy as np
+from numpy.random import *
+import matplotlib.pyplot as plt
+import time
+
+a  = np.array(Image.open('a.jpg'))
+b  = np.array(Image.open('b.jpg'))
+c  = np.array(Image.open('c.jpg'))
+d  = np.array(Image.open('d.jpg'))
+print(a.shape, a.dtype)
+Image.fromarray(a)
+
+
+gauss = np.random.normal(0,15,(40,360,640,3))
+gauss = gauss.reshape(40,360,640,3)
+x = np.array([a,b,c,d]*10) + gauss
+print(x.shape)
+
+x = np.clip(x,0,255).astype(np.uint8)
+plt.imshow(x[0],'gray', vmin = 0, vmax = 255)
+plt.show()
+#Image.fromarray(a)
+print(x[0].shape)
+
+x = np.array((a,b,c,d))
+som_size = 9
+m = randint(0,256,(som_size**2,360,640,3),dtype=np.uint8)
+N = 1001
+c = np.array(([10]*N))
+for i in range(1,som_size):
+    n = np.array([i]*som_size)
+    if i == 1:
+        ni = np.array([0]*som_size)
+    ni = np.append(ni,n)
+M = np.array([[i for i in range(0,som_size)]*som_size])
+r = np.hstack((M.reshape(som_size**2,1),ni.reshape(som_size**2,1)))
+q = np.random.rand(som_size**2,som_size**2)
+for i in range(0,som_size**2):
+    for j in range(0,som_size**2):
+        q[i][j] = np.linalg.norm(r[i]-r[j])
+#m[0] = x[0]
+#m[9] = x[1]
+#m[90] = x[2]
+#m[99] = x[3]
+start = time.time()
+def som(x,m,r,q,N,c,som_size):
+ 
+    for i in range(0,N):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.5*(1.0-i/N)+0.1
+        sigma2 = 10.0*(1.0-i/N)
+        X = 300000.0000000000
+        xi = randint(0,4)
+        c_x = np.array(([X]*400))
+        for c_i in range(0,som_size**2):
+            c_x[c_i] = np.linalg.norm(x[xi]-m[c_i])
+        c[i] = np.argmin(c_x)
+        if i % 50 == 0:
+            for im in range(0,som_size):
+                for ix in range(som_size*im,som_size*(im+1)):
+                    if ix % som_size == 0:
+                        img_h = m[ix]
+                    else:    
+                        img_h= np.concatenate((img_h,m[ix]), axis = 1)
+                if im == 0:
+                    img = img_h
+                else:
+                    img = np.concatenate((img,img_h), axis = 0) 
+               
+            plt.figure(figsize=(8,6))
+            plt.axis("off")
+            plt.title('i=' + str(i))
+            pil_img = Image.fromarray(np.uint8(img))
+            plt.imshow(pil_img)
+            plt.savefig('som_5picture%d.png' % i,dpi=300,bbox_inches='tight')
+            plt.show()
+            
+        else:
+            q2 = np.where(q[c[i]] < sigma2) 
+            for m_i in range(0,q2[0].size):
+                m_x = m[q2[0][m_i]] + alpha2 * np.exp(-(np.linalg.norm(r[c[i]]-r[q2[0][m_i]]))**2/(2*sigma2**2))*(x[xi] - m[q2[0][m_i]])
+                m[q2[0][m_i]] = m_x
+    return m                
+m = som(x,m,r,q,N,c,som_size)
+elapsed_time = time.time() - start
+print ("elapsed_time:{0}".format(elapsed_time) + "[sec]")
+
+print(c[799])
+plt.hist(c,bins=100,rwidth=1)
+plt.savefig('som000.png')
+plt.show()
