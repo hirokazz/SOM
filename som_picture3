@@ -1,0 +1,76 @@
+from PIL import Image
+import numpy as np
+from numpy.random import *
+import matplotlib.pyplot as plt
+import time
+
+
+x = np.array((a,b,c2,d))
+
+som_size = 10
+m = randint(0,256,(som_size**2,360,640,3),dtype=np.int64)
+N = 101
+c = np.array(([10]*N))
+for i in range(1,som_size):
+    n = np.array([i]*som_size)
+    if i == 1:
+        ni = np.array([0]*som_size)
+    ni = np.append(ni,n)
+M = np.array([[i for i in range(0,som_size)]*som_size])
+r = np.hstack((M.reshape(som_size**2,1),ni.reshape(som_size**2,1)))
+a  = np.array(Image.open('a.JPG'))
+b  = np.array(Image.open('b.JPG'))
+c2  = np.array(Image.open('c.JPG'))
+d  = np.array(Image.open('d.JPG'))
+print(c2.shape, c2.dtype)
+Image.fromarray(c2)
+
+q = np.random.rand(som_size**2,som_size**2)
+for i in range(0,som_size**2):
+    for j in range(0,som_size**2):
+        q[i][j] = np.linalg.norm(r[i]-r[j])
+print(m[90].shape) 
+print(x[2].shape)
+m[0] = x[0]
+m[9] = x[1]
+m[90] = x[2]
+m[99] = x[3]
+start = time.time()
+def som(x,m,r,q,N,c,som_size):
+ 
+    for i in range(0,N):
+        alpha = 0.2
+        sigma = 0.8
+        alpha2 = 0.1*(1.0-i/N)+0.1
+        sigma2 = 3.0*(1.0-i/N)
+        X = 300000.0000000000
+        xi = randint(0,2)
+        c_x = np.array(([X]*400))
+        for c_i in range(0,som_size):
+            c_x[c_i] = np.linalg.norm(x[xi]-m[c_i])
+        c[i] = np.argmin(c_x)
+        if i % 50 == 0:
+            for im in range(0,som_size):
+                if im == 0:
+                    img = m[im]
+                else:    
+                    img = np.concatenate((img,m[im]), axis = 1)
+                
+               
+            plt.figure(figsize=(8,6))
+            plt.axis("off")
+            plt.title('i=' + str(i))
+            pil_img = Image.fromarray(np.uint8(img))
+            plt.imshow(pil_img)
+            plt.savefig('som1000_picture%d.png' % i,dpi=300,bbox_inches='tight')
+            plt.show()
+            
+        else:
+            #q2 = np.where(q[c[i]] < sigma2) 
+            for m_i in range(0,som_size):
+                m_x = m[m_i] + alpha2 * np.exp(-(np.linalg.norm(c[i]-m_i))**2/(2*sigma2**2))*(x[xi] - m[m_i])
+                m[m_i] = m_x
+    return m                
+m = som(x,m,r,q,N,c,som_size)
+elapsed_time = time.time() - start
+print ("elapsed_time:{0}".format(elapsed_time) + "[sec]")
